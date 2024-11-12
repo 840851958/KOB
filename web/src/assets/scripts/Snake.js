@@ -11,7 +11,7 @@ export class Snake extends AcGameObject {
 
         this.cells  = [new Cell(info.r, info.c)];//存放蛇的身体，cell[0]为蛇头
         this.next_cell = null;
-        this.speed = 5;
+        this.speed = 5; // 蛇每秒走的格子
         this.direction = -1; // -1表示没有动作，0，1，2，3分别表示上右下左
         this.status = "idle"; // idle表示静止，还有move、die两个状态
         
@@ -72,9 +72,9 @@ export class Snake extends AcGameObject {
             
         }
 
-        if(!this.gamemap.check_valid(this.next_cell)){// 在下一步操作蛇撞了，死掉
+/*         if(!this.gamemap.check_valid(this.next_cell)){// 在下一步操作蛇撞了，死掉
             this.status = "die"; 
-        }
+        } */
     }
 
     update_move(){

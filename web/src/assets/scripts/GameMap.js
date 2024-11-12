@@ -3,15 +3,16 @@ import { Wall } from "./Wall";
 import { Snake } from "./Snake";
 
 export class GameMap extends AcGameObject {
-    constructor(ctx, parent){
+    constructor(ctx, parent,store){
         super();
         this.ctx = ctx;
         this.parent = parent;
+        this.store = store;
         this.L = 0;
 
         // 这样做是为了防止两条蛇同时进入一个点中造成误判。通过判断坐标和奇偶的方式调整，使得一条蛇的运动轨迹为奇偶奇，另一条蛇为偶奇偶。
-        this.cols = 13;
-        this.rows = 14;
+        this.cols = 14;
+        this.rows = 13;
         
         this.inner_walls = 20; 
         this.walls = [];
@@ -22,10 +23,11 @@ export class GameMap extends AcGameObject {
         ];
     }
 
-    //检查连通性
+    // 这些代码已经在后端重构
+/*     //检查连通性
     check_connectivity(g,sx,sy,tx,ty){
         // 递归终止条件
-        if(sx == tx && sy == ty) return true;
+        if(sx == tx && sy == ty) return true;// tx ty是终点位置
         // 标记已经走过的位置
         g[sx][sy] = true;
         let dx = [-1,0,1,0], dy = [0,1,0,-1];
@@ -39,8 +41,9 @@ export class GameMap extends AcGameObject {
         }
         return false;
     }
-
+*/
     creat_walls(){
+        /*
         // 布尔数组的作用,存储并判断是否有墙
         const g = [];
         for(let r = 0; r < this.rows; r++){
@@ -72,8 +75,9 @@ export class GameMap extends AcGameObject {
             }
         }
         const copy_g = JSON.parse(JSON.stringify(g));
-        if(!this.check_connectivity(copy_g,this.rows-2,1,1,this.cols-2)) return false;
+        if(!this.check_connectivity(copy_g,this.rows-2,1,1,this.cols-2)) return false; */
         //加上障碍物
+        const g = this.store.state.pk.gamemap;
         for(let r = 0; r < this.rows; r++){
             for(let c = 0; c < this.cols; c++){
                 if (g[r][c]) {
@@ -81,31 +85,34 @@ export class GameMap extends AcGameObject {
                 }
             }
         }
-        return true;
-
-
     }
     add_listening_events(){
         this.ctx.canvas.focus(); // 聚焦画布
-        const [snake0, snake1] = this.snakes;
+        /* const [snake0, snake1] = this.snakes; */
         this.ctx.canvas.addEventListener("keydown", e => {
-            if(e.key === 'w') snake0.set_direction(0);
-            else if(e.key === 'd') snake0.set_direction(1);
-            else if(e.key === 's') snake0.set_direction(2);
-            else if(e.key === 'a') snake0.set_direction(3);
-            else if(e.key === 'ArrowUp') snake1.set_direction(0);
-            else if(e.key === 'ArrowRight') snake1.set_direction(1);
-            else if(e.key === 'ArrowDown') snake1.set_direction(2);
-            else if(e.key === 'ArrowLeft') snake1.set_direction(3);
+            let d = -1;
+            if(e.key === 'w') d = 0;
+            else if(e.key === 'd') d = 1;
+            else if(e.key === 's') d = 2;
+            else if(e.key === 'a') d = 3;
+
+            if(d >= 0){ // 向后端发送移动请求，通过socket
+                this.store.state.pk.socket.send(JSON.stringify({
+                    event: "move",
+                    direction: d,
+                }));
+
+            }
         });
 
     }
 
     start(){
-        for(let i = 0; i < 1000; i++){
+        this.creat_walls();
+/*         for(let i = 0; i < 1000; i++){
             if (this.creat_walls())
                 break; 
-        }
+        } */
         this.add_listening_events();
         
     }
