@@ -18,8 +18,8 @@ public class MatchingController {
     public String addPlayer(@RequestParam MultiValueMap<String,String> data){ // MutiValueMap 是一个key对应一个list（value）
         Integer userId = Integer.valueOf(Objects.requireNonNull(data.getFirst("userId")));
         Integer rating = Integer.valueOf(Objects.requireNonNull(data.getFirst("rating")));
-
-        return matchingService.addPlayer(userId, rating);
+        Integer botId = Integer.valueOf(Objects.requireNonNull(data.getFirst("bot_id")));
+        return matchingService.addPlayer(userId, rating,botId);
     }
     @PostMapping("/player/remove/")
     public String removePlayer(@RequestParam MultiValueMap<String,String> data){

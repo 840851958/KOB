@@ -23,6 +23,8 @@ import { useStore } from "vuex";
         setup() {
         const store = useStore();
         const socketUrl = `ws://localhost:3000/websocket/${store.state.user.token}/`;
+        
+        store.commit("updateLoser", "none");
 
         let socket = null;
         onMounted(() => {
@@ -47,7 +49,7 @@ import { useStore } from "vuex";
                     // setTimeout设置延迟2s后执行
                     setTimeout(() => {
                         store.commit("updateStatus","playing");
-                    },1000);
+                    },200);
                     store.commit("updateGame",data.game);
                 }else if(data.event === "move"){ // 首先得找到两条蛇，蛇定义在了gamemap中的snakes
                     console.log(data);
